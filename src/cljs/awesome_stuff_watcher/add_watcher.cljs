@@ -1,6 +1,7 @@
 (ns awesome-stuff-watcher.add-watcher
   (:require [json-html.core :refer [edn->hiccup]]
-            [reagent.core :as reagent :refer [atom]]))
+            [reagent.core :as reagent :refer [atom]]
+            [ajax.core :refer [GET POST]]))
 (defn watcher-selector [doc]
   [:p
    [:label "Bevaking"]
@@ -20,6 +21,10 @@
 (defn search [doc] [:input {:type        "text"
                             :placeholder "Sök..."
                             :on-change   #(swap! doc assoc :q (-> % .-target .-value))}])
+(defn ajax [doc] (GET "/preview" {:params doc
+                                  :error-handler (fn [r] (prn r))
+                                  :response-format :json
+                                  :keywords? true}))
 (defn page []
   (let [doc (atom {})]
     (fn []
@@ -28,7 +33,7 @@
        [watcher-selector doc]
        [search doc]
        [extra-fields (:watcher @doc)]
+       (println (ajax @doc))
        [:hr]
        [:h1 "Document State"]
-       [edn->hiccup @doc]]
-      )))
+       [edn->hiccup @doc]])))

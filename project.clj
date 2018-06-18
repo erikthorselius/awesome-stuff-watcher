@@ -9,6 +9,7 @@
                  [reagent "0.8.1"]
                  [reagent-utils "0.3.1"]
                  [reagent-forms "0.5.42"]
+                 [cljs-ajax "0.7.3"]
                  [json-html "0.3.5"]
                  [ring "1.6.3"]
                  [ring/ring-defaults "0.3.1"]
@@ -19,7 +20,8 @@
                   :scope "provided"]
                  [secretary "1.2.3"]
                  [venantius/accountant "0.2.4"
-                  :exclusions [org.clojure/tools.reader]]]
+                  :exclusions [org.clojure/tools.reader]]
+                 [com.taoensso/timbre "4.10.0"]]
 
   :plugins [[lein-environ "1.1.0"]
             [lein-cljsbuild "1.1.7"]
@@ -63,19 +65,13 @@
               :output-dir "target/cljsbuild/public/js/out"
               :source-map true
               :optimizations :none
-              :pretty-print  true}}
-
-
-
-            }
-   }
-
+              :pretty-print  true}}}}
   :figwheel
   {:http-server-root "public"
    :server-port 3449
    :nrepl-port 7002
-   :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"
-                      ]
+   :nrepl-middleware ["cemerick.piggieback/wrap-cljs-repl"]
+
    :css-dirs ["resources/public/css"]
    :ring-handler awesome-stuff-watcher.handler/app}
 
@@ -91,13 +87,13 @@
                                   [figwheel-sidecar "0.5.16"]
                                   [org.clojure/tools.nrepl "0.2.13"]
                                   [com.cemerick/piggieback "0.2.2"]
-                                  [pjstadig/humane-test-output "0.8.3"]
+                                  [pjstadig/humane-test-output "0.8.3"]]
                                   
- ]
+
 
                    :source-paths ["env/dev/clj"]
-                   :plugins [[lein-figwheel "0.5.16"]
-]
+                   :plugins [[lein-figwheel "0.5.16"]]
+
 
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
