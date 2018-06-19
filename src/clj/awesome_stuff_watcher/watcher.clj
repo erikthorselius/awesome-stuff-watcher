@@ -3,9 +3,7 @@
             [clj-http.client :as client]
             [hickory.core :as h]
             [hickory.select :as s]))
-(defn- blocket-image [element])
-
-
+(defn- blocket-image [html] (s/select (s/tag :article) html))
 (defn- pick-watcher [url] (cond
                             (str/starts-with? url "https://www.blocket.se") :blocket
                             (str/starts-with? url "https:/www.systembolaget,se") :systembolaget
@@ -15,7 +13,7 @@
 (defmethod dispatch :blocket [url] (let [response (client/get url)]
                                      (->>(:body response)
                                          (h/parse)
-                                         (h/as-hickory)
-                                         (s/select
-                                           (s/child (s/id "item_list")
-                                                    (s/tag :article))))))
+                                         (h/as-hickory))))
+;(s/select
+;                                           (s/child (s/id "item_list")
+;                                                    (s/tag :article))
