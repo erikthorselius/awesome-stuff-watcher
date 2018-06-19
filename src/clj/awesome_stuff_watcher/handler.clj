@@ -33,12 +33,11 @@
            (GET "/" [] (loading-page))
            (GET "/about" [] (loading-page))
            (GET "/add-watcher" [] (loading-page))
-           (GET "/preview" [watcher q] (do (info (str watcher " " q))
-                                           {:status  200
-                                            :headers {"Content-Type" "application/json; charset=utf-8"}
-                                            :body    (json/write-str {:data "preview data"})}))
+           (GET "/preview" [q] (do (info (str q))
+                                   {:status  200
+                                    :headers {"Content-Type" "application/json; charset=utf-8"}
+                                    :body    (json/write-str {:data (str "url was:" q)})}))
 
            (resources "/")
            (not-found "Not Found"))
-
 (def app (wrap-middleware #'routes))

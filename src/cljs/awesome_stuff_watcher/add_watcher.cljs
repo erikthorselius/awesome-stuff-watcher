@@ -21,19 +21,21 @@
 (defn search [doc] [:input {:type        "text"
                             :placeholder "Sök..."
                             :on-change   #(swap! doc assoc :q (-> % .-target .-value))}])
-(defn ajax [doc] (GET "/preview" {:params doc
-                                  :error-handler (fn [r] (prn r))
-                                  :response-format :json
-                                  :keywords? true}))
+(defn preview [doc] (do (GET "/preview" {:params          @doc
+                                         :handler #(swap! doc assoc :preview (:data %))
+                                         :error-handler   (fn [r] (prn r))
+                                         :response-format :json
+                                         :keywords?       true})
+                        [edn->hiccup (:preview @doc)]))
 (defn page []
   (let [doc (atom {})]
     (fn []
       [:div
        [:div.page-header [:h1 "Lägg till bevakare"]]
-       [watcher-selector doc]
-       [search doc]
-       [extra-fields (:watcher @doc)]
-       (println (ajax @doc))
+       [:form {:action "/"}
+        [search doc]
+        [:input {:type "submit" :value "Submit"}]
+        [:p (preview doc)]]
        [:hr]
        [:h1 "Document State"]
        [edn->hiccup @doc]])))
