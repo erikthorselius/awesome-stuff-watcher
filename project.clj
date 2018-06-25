@@ -8,6 +8,8 @@
                  [ring-server "0.5.0"]
                  [ring "1.6.3"]
                  [ring/ring-defaults "0.3.1"]
+                 [ring/ring-json "0.4.0"]
+                 [ring-logger "1.0.1"]
                  [clj-http "3.9.0"]
                  [hickory "0.7.1"]
                  [reagent "0.8.1"]

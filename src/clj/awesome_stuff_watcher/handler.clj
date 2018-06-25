@@ -1,11 +1,13 @@
 (ns awesome-stuff-watcher.handler
-  (:require [compojure.core :refer [GET defroutes]]
+  (:require [compojure.core :refer [GET defroutes routes]]
             [compojure.route :refer [not-found resources]]
+            [ring.util.response :refer [response]]
             [hiccup.page :refer [include-js include-css html5]]
-            [awesome-stuff-watcher.middleware :refer [wrap-middleware]]
+            [awesome-stuff-watcher.middleware :refer [wrap-middleware wrap-api]]
             [config.core :refer [env]]
             [clojure.data.json :as json]
-            [taoensso.timbre :as timbre :refer [info]]))
+            [taoensso.timbre :as timbre :refer [info]]
+            [awesome-stuff-watcher.watcher :as watcher]))
 
 (def mount-target
   [:div#app
@@ -29,15 +31,14 @@
      (include-js "/js/app.js")]))
 
 
-(defroutes routes
+(def api-routes
+  (routes
+    (GET "/preview" [q] (response {:data (take 5 (watcher/dispatch q))}))))
+
+(defroutes frontend-routes
            (GET "/" [] (loading-page))
            (GET "/about" [] (loading-page))
            (GET "/add-watcher" [] (loading-page))
-           (GET "/preview" [q] (do (info (str q))
-                                   {:status  200
-                                    :headers {"Content-Type" "application/json; charset=utf-8"}
-                                    :body    (json/write-str {:data (str "url was:" q)})}))
-
            (resources "/")
            (not-found "Not Found"))
-(def app (wrap-middleware #'routes))
+(def app (routes (wrap-api #'api-routes) (wrap-middleware #'frontend-routes)))

@@ -1,0 +1,36 @@
+(ns awesome-stuff-watcher.blocket
+  (:require [clojure.string :as str]
+            [clj-http.client :as client]
+            [hickory.core :as h]
+            [hickory.select :as s]))
+(defn- cdn? [str] (.startsWith str "https://cdn.blocket.com"))
+(defn- image [html] (let [fragment (some-> (s/select (s/or (s/attr :src cdn?)
+                                                           (s/attr :longdesc cdn?))
+                                                     html)
+                                           (first))
+                          images (select-keys (:attrs fragment) [:src :longdesc])]
+                      (if (nil? (:longdesc images))
+                        (:src images)
+                        (:longdesc images))))
+(defn- price [html] (some-> (s/select (s/attr :itemprop #(= "price" %)) html)
+                            (first)
+                            (:content)
+                            (first)))
+(defn- url [html] (-> (s/select (s/class "item_link") html)
+                      (first)
+                      (get-in [:attrs :href])))
+(defn- title [html] (-> (s/select (s/class "item_link") html)
+                        (first)
+                        (get-in [:attrs :title])))
+(defn- item [html] {:img (image html)
+                    :price (price html)
+                    :url (url html)
+                    :title (title html)})
+(defn- item-list [html] (s/select (s/child (s/id "item_list")
+                                           (s/tag :article)) html))
+(defn dispatch [url] (let [response (client/get url)]
+                       (->> (:body response)
+                            (h/parse)
+                            (h/as-hickory)
+                            (item-list)
+                            (map item))))
